@@ -844,9 +844,10 @@ body.cursor-active [role="button"] {
   gap: 10px;
   padding: 14px 32px;
   border-radius: 100px;
-  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
@@ -1885,17 +1886,21 @@ body.cursor-active [role="button"] {
     right: 0;
     bottom: 0;
     width: 280px;
+    height: 100%;
+    height: 100dvh;
     background: rgba(5, 5, 5, 0.95);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     flex-direction: column;
     justify-content: center;
-    gap: 32px;
-    padding: 48px;
+    gap: 28px;
+    padding: 48px 36px;
     transform: translateX(100%);
     transition: transform 0.4s var(--ease-out);
     border-left: 1px solid var(--glass-border);
     z-index: 10000;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .nav__links.open {
@@ -1998,6 +2003,8 @@ body.cursor-active [role="button"] {
 
   .terminal { font-size: 0.75rem; }
   .terminal__body { min-height: 180px; max-height: 280px; padding: 14px; }
+  .terminal__input { font-size: 16px; }
+  .form-group__input, .form-group__textarea { font-size: 16px; }
 
   .marquee__item { font-size: 1.2rem !important; padding: 0 24px; }
 

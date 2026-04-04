@@ -15,7 +15,47 @@ document.addEventListener('DOMContentLoaded', () => {
   initTimeGreeting();
   initMarquee();
   initThemeToggle();
+  initHaptics();
 });
+
+/* ── Haptic Feedback (web-haptics library) ────────────────────────── */
+function initHaptics() {
+  // Dynamically import web-haptics from CDN
+  import('https://esm.sh/web-haptics@0.0.6').then(({ WebHaptics }) => {
+    if (!WebHaptics.isSupported) return;
+
+    const haptics = new WebHaptics();
+
+    // Light tap for buttons/links
+    const tapSelector = 'a, button, .btn, .nav__link, .nav__toggle, .nav__grid-btn, .nav-grid__item, .project-card, .chat-welcome__suggestion, .social-link, .theme-toggle, [role="button"]';
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.target.closest(tapSelector)) {
+        haptics.trigger(10, { intensity: 0.3 }); // Ultra-light 10ms tap
+      }
+    }, { passive: true });
+
+    // Nudge for theme toggle
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => haptics.trigger('nudge', { intensity: 0.4 }));
+    }
+
+    // Success for form submit
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', () => haptics.trigger('success', { intensity: 0.5 }));
+    }
+
+    // Light tap for nav toggle
+    const navToggle = document.querySelector('.nav__toggle');
+    if (navToggle) {
+      navToggle.addEventListener('click', () => haptics.trigger('nudge', { intensity: 0.3 }));
+    }
+  }).catch(() => {
+    // Silently fail — haptics are a progressive enhancement
+  });
+}
 
 /* ── Theme Toggle ─────────────────────────────────────────────────── */
 function initThemeToggle() {
@@ -319,17 +359,30 @@ function initNavigation() {
 
   // Mobile toggle
   if (toggle && links) {
+    function openNav() {
+      links.classList.add('open');
+      toggle.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeNav() {
+      links.classList.remove('open');
+      toggle.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
     toggle.addEventListener('click', () => {
-      links.classList.toggle('open');
-      toggle.classList.toggle('active');
+      links.classList.contains('open') ? closeNav() : openNav();
     });
 
     // Close on link click
     links.querySelectorAll('.nav__link').forEach(link => {
-      link.addEventListener('click', () => {
-        links.classList.remove('open');
-        toggle.classList.remove('active');
-      });
+      link.addEventListener('click', closeNav);
+    });
+
+    // Close on backdrop click (the ::before pseudo-element area)
+    links.addEventListener('click', (e) => {
+      if (e.target === links) closeNav();
     });
   }
 
@@ -685,15 +738,53 @@ function initTimeGreeting() {
   const el = document.querySelector('.hero__greeting');
   if (!el) return;
 
-  const hour = new Date().getHours();
-  let greeting;
-  if (hour < 6) greeting = 'Burning the midnight oil?';
-  else if (hour < 12) greeting = 'Good morning';
-  else if (hour < 17) greeting = 'Good afternoon';
-  else if (hour < 21) greeting = 'Good evening';
-  else greeting = 'Working late?';
+  const taglines = [
+    'Backend Engineer',
+    'Java & Spring Boot',
+    'Building at Scale',
+    'IIIT Delhi Alumna',
+    'Notification Systems',
+    'API Architect',
+    'PayPal Comms Hub',
+  ];
 
-  el.textContent = greeting;
+  let currentIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let currentText = '';
+
+  function type() {
+    const target = taglines[currentIndex];
+
+    if (!isDeleting) {
+      currentText = target.substring(0, charIndex + 1);
+      charIndex++;
+    } else {
+      currentText = target.substring(0, charIndex - 1);
+      charIndex--;
+    }
+
+    el.textContent = currentText;
+
+    let delay;
+
+    if (!isDeleting && charIndex === target.length) {
+      // Pause at full text
+      delay = 3000;
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      // Move to next tagline
+      isDeleting = false;
+      currentIndex = (currentIndex + 1) % taglines.length;
+      delay = 500;
+    } else {
+      delay = isDeleting ? 40 : 80 + Math.random() * 40;
+    }
+
+    setTimeout(type, delay);
+  }
+
+  type();
 }
 
 /* ── Marquee ──────────────────────────────────────────────────────── */

@@ -201,41 +201,74 @@ function initDynamicBackground() {
 function initCustomCursor() {
   const cursor = document.querySelector('.cursor');
   if (!cursor || window.matchMedia('(max-width: 768px)').matches) return;
-  document.body.classList.add('cursor-active');
 
-  let mouseX = 0, mouseY = 0;
-  let cursorX = 0, cursorY = 0;
-  let dirty = true;
+  let mouseX = -100, mouseY = -100;
+  let cursorX = -100, cursorY = -100;
+  let firstMove = true;
   let animating = false;
+
+  // Hide cursor until first mouse move
+  cursor.style.opacity = '0';
 
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    dirty = true;
+
+    if (firstMove) {
+      // Snap to position immediately on first move
+      cursorX = mouseX;
+      cursorY = mouseY;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+      cursor.style.opacity = '1';
+      document.body.classList.add('cursor-active');
+      firstMove = false;
+    }
+
     if (!animating) {
       animating = true;
       animate();
     }
   });
 
+  // Hide cursor when mouse leaves the window
+  document.addEventListener('mouseleave', () => {
+    cursor.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorX = mouseX;
+    cursorY = mouseY;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    cursor.style.opacity = '1';
+  });
+
   function animate() {
-    if (!dirty && Math.abs(mouseX - cursorX) < 0.5 && Math.abs(mouseY - cursorY) < 0.5) {
+    if (Math.abs(mouseX - cursorX) < 0.5 && Math.abs(mouseY - cursorY) < 0.5) {
+      cursorX = mouseX;
+      cursorY = mouseY;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
       animating = false;
       return;
     }
-    cursorX += (mouseX - cursorX) * 0.15;
-    cursorY += (mouseY - cursorY) * 0.15;
+    cursorX += (mouseX - cursorX) * 0.18;
+    cursorY += (mouseY - cursorY) * 0.18;
     cursor.style.left = cursorX + 'px';
     cursor.style.top = cursorY + 'px';
-    dirty = false;
     requestAnimationFrame(animate);
   }
 
-  // Hover states
-  const hoverTargets = document.querySelectorAll('a, button, .btn, .project-card, .skill-card, .nav-grid__item, input, textarea');
-  hoverTargets.forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+  // Hover states — event delegation for performance and dynamic elements
+  const hoverSelector = 'a, button, .btn, .project-card, .skill-card, .nav-grid__item, input, textarea, .chat-welcome__suggestion, .social-link, .philosophy-card, .oss-card, .timeline__item, [role="button"]';
+
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverSelector)) cursor.classList.add('hovering');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverSelector)) cursor.classList.remove('hovering');
   });
 
   document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
@@ -389,31 +422,49 @@ function initMagneticButtons() {
 }
 
 /* ── Page Transitions ─────────────────────────────────────────────── */
+let isNavigating = false;
+
 function initPageTransitions() {
-  document.body.classList.add('page-entering');
+  const overlay = document.querySelector('.page-transition');
+  if (!overlay) return;
 
-  document.querySelectorAll('a[href]').forEach(link => {
+  // Overlay starts visible (opacity:1 in CSS) — covers raw page load.
+  // Once DOM is ready, fade it out to reveal the page.
+  requestAnimationFrame(() => {
+    overlay.classList.add('hidden');
+  });
+
+  // Intercept local links via event delegation
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:')) return;
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('javascript:')) return;
+    if (link.getAttribute('target')) return;
 
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      navigateTo(href);
-    });
+    e.preventDefault();
+    navigateTo(href);
   });
 }
 
 function navigateTo(url) {
+  if (isNavigating) return;
+  isNavigating = true;
+
   const overlay = document.querySelector('.page-transition');
   if (!overlay) {
     window.location.href = url;
     return;
   }
 
-  overlay.classList.add('active');
+  // Show overlay (remove hidden class → opacity transitions to 1)
+  overlay.classList.remove('hidden');
+
+  // Navigate after overlay fully covers
   setTimeout(() => {
     window.location.href = url;
-  }, 400);
+  }, 350);
 }
 
 /* ── Terminal ─────────────────────────────────────────────────────── */
@@ -432,8 +483,11 @@ function initTerminal() {
       '  skills       — Technical skills',
       '  education    — Academic background',
       '  experience   — Work experience',
-      '  contact      — Get in touch',
-      '  projects     — View projects',
+      '  contact      — Contact info',
+      '  home         — Go to home page',
+      '  about        — Go to about page',
+      '  projects     — Go to projects page',
+      '  chat         — Open chat',
       '  quote        — Random dev quote',
       '  clear        — Clear terminal',
       '  help         — Show this message',
@@ -491,6 +545,18 @@ function initTerminal() {
     ],
     projects: () => [
       'Redirecting to projects page...',
+    ],
+    home: () => [
+      'Redirecting to home page...',
+    ],
+    about: () => [
+      'Redirecting to about page...',
+    ],
+    chat: () => [
+      'Redirecting to chat...',
+    ],
+    contact: () => [
+      'Redirecting to contact page...',
     ],
     quote: () => {
       const quotes = [
@@ -565,11 +631,12 @@ function initTerminal() {
             body.removeChild(body.firstChild);
           }
           terminalHistory = [];
-        } else if (cmd === 'projects') {
+        } else if (['projects', 'home', 'about', 'chat', 'contact'].includes(cmd)) {
           addLine(result[0]);
           terminalHistory.push({ text: result[0], type: 'output' });
           saveTerminalHistory();
-          setTimeout(() => navigateTo('projects.html'), 800);
+          const pageMap = { projects: 'projects.html', home: 'index.html', about: 'about.html', chat: 'chat.html', contact: 'contact.html' };
+          setTimeout(() => navigateTo(pageMap[cmd]), 800);
         } else {
           result.forEach(line => {
             addLine(line);

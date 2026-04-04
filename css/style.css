@@ -55,6 +55,33 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Auto-hide scrollbar when not scrolling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
 body {
@@ -129,9 +156,19 @@ button {
 }
 
 body.cursor-active,
+body.cursor-active a,
 body.cursor-active button,
-body.cursor-active .nav-grid__item {
-  cursor: none;
+body.cursor-active input,
+body.cursor-active textarea,
+body.cursor-active select,
+body.cursor-active .btn,
+body.cursor-active .nav-grid__item,
+body.cursor-active .project-card,
+body.cursor-active .social-link,
+body.cursor-active .philosophy-card,
+body.cursor-active .chat-welcome__suggestion,
+body.cursor-active [role="button"] {
+  cursor: none !important;
 }
 
 /* ── Dynamic Background ───────────────────────────────────────────── */
@@ -177,24 +214,15 @@ body.cursor-active .nav-grid__item {
   inset: 0;
   background: var(--bg-primary);
   z-index: 99998;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.page-transition.active {
-  opacity: 1;
   pointer-events: all;
-}
-
-body.page-entering .page-transition {
   opacity: 1;
-  animation: pageFadeOut 0.6s var(--ease-out) forwards;
+  transition: opacity 0.35s ease;
+  will-change: opacity;
 }
 
-@keyframes pageFadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+.page-transition.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── Navigation ───────────────────────────────────────────────────── */

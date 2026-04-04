@@ -711,6 +711,7 @@ body.cursor-active [role="button"] {
   display: inline-block;
   text-align: left;
   min-width: calc(20ch + 20 * 0.15em);
+  min-height: 1.2em;
 }
 
 @media (max-width: 768px) {
@@ -738,6 +739,7 @@ body.cursor-active [role="button"] {
   margin-bottom: 32px;
   text-rendering: geometricPrecision;
   -webkit-text-stroke: 0.3px rgba(245, 241, 235, 0.25);
+  word-spacing: 0.15em;
   word-break: break-word;
 }
 

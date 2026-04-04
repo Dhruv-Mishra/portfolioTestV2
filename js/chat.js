@@ -123,11 +123,25 @@
 
   // ── Initialize ─────────────────────────────────────────────────
   loadHistory();
-  messagesEl.addEventListener('scroll', () => {
-    const atBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 120;
-    isNearBottom = atBottom;
-    if (suggestionsBar && !atBottom) suggestionsBar.style.display = 'none';
-  }, { passive: true });
+  initScrollWatcher();
+
+  // ── Scroll-aware + auto-hide scrollbar ─────────────────────────
+  let scrollHideTimer = null;
+
+  function initScrollWatcher() {
+    messagesEl.addEventListener('scroll', () => {
+      const atBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 120;
+      isNearBottom = atBottom;
+      if (suggestionsBar && !atBottom) suggestionsBar.style.display = 'none';
+
+      // Show scrollbar thumb while scrolling
+      messagesEl.classList.add('scrolling');
+      clearTimeout(scrollHideTimer);
+      scrollHideTimer = setTimeout(() => {
+        messagesEl.classList.remove('scrolling');
+      }, 1200);
+    }, { passive: true });
+  }
 
   function scrollToBottom() {
     if (!isNearBottom) return;
@@ -156,15 +170,16 @@
       conversation = d.conversation;
       conversation.forEach(m => appendInstant(m.role, m.content));
       forceScroll();
+      // Restore suggestions if there's history
+      showSuggestions();
     } catch (e) { localStorage.removeItem(STORAGE_KEY); }
   }
 
   function clearHistory() {
     conversation = [];
     localStorage.removeItem(STORAGE_KEY);
-    messagesEl.querySelectorAll('.chat-msg').forEach(el => el.remove());
+    messagesEl.querySelectorAll('.chat-msg, .chat-suggestions-bar').forEach(el => el.remove());
     if (welcomeEl) welcomeEl.style.display = '';
-    if (suggestionsBar) suggestionsBar.style.display = 'none';
     suggestionOffset = 0;
   }
 
@@ -175,7 +190,7 @@
     text = text.trim();
     if (!text || isProcessing) return;
 
-    if (suggestionsBar) suggestionsBar.style.display = 'none';
+    removeSuggestions();
     isProcessing = true;
     sendBtn.disabled = true;
     inputEl.disabled = true;
@@ -400,24 +415,39 @@
     messagesEl.appendChild(d);
   }
 
-  // ── Suggestions ────────────────────────────────────────────────
+  // ── Suggestions (inline in chat flow) ───────────────────────────
   function showSuggestions() {
-    if (!suggestionsBar || !isNearBottom) return;
+    // Remove any existing inline suggestions
+    removeSuggestions();
+
     const picks = [];
     for (let i = 0; i < 4; i++) picks.push(POST_SUGGESTIONS[(suggestionOffset + i) % POST_SUGGESTIONS.length]);
     suggestionOffset = (suggestionOffset + 4) % POST_SUGGESTIONS.length;
 
-    suggestionsBar.innerHTML = picks.map(t =>
+    const bar = document.createElement('div');
+    bar.className = 'chat-suggestions-bar';
+    bar.id = 'chatSuggestionsInline';
+
+    bar.innerHTML = picks.map(t =>
       `<button class="chat-welcome__suggestion" data-msg="${t.replace(/"/g, '&quot;')}">${t}</button>`
     ).join('');
-    suggestionsBar.style.display = 'flex';
 
-    suggestionsBar.querySelectorAll('.chat-welcome__suggestion').forEach(btn => {
+    // Append to messages area (part of scroll flow)
+    messagesEl.appendChild(bar);
+
+    bar.querySelectorAll('.chat-welcome__suggestion').forEach(btn => {
       btn.addEventListener('click', () => {
-        suggestionsBar.style.display = 'none';
+        removeSuggestions();
         sendMessage(btn.getAttribute('data-msg'));
       });
     });
+
+    forceScroll();
+  }
+
+  function removeSuggestions() {
+    const existing = messagesEl.querySelectorAll('.chat-suggestions-bar');
+    existing.forEach(el => el.remove());
   }
 
   // ── Auto-resize ────────────────────────────────────────────────

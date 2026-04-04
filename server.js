@@ -1,10 +1,56 @@
 require('dotenv').config({ path: '.env.local' });
 const express = require('express');
+const compression = require('compression');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Configurable settings from .env.local ───────────────────────────
+// ── Production hardening ────────────────────────────────────────────
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+
+// ── Compression ─────────────────────────────────────────────────────
+app.use(compression({
+  level: 6,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  },
+}));
+
+// ── Static files with aggressive caching ────────────────────────────
+app.use('/css', express.static(path.join(__dirname, 'css'), {
+  maxAge: '7d',
+  etag: true,
+  lastModified: true,
+  immutable: false,
+}));
+
+app.use('/js', express.static(path.join(__dirname, 'js'), {
+  maxAge: '7d',
+  etag: true,
+  lastModified: true,
+  immutable: false,
+}));
+
+// HTML files — short cache, always revalidate
+app.use(express.static(__dirname, {
+  maxAge: '1h',
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+  },
+}));
+
+// ── Body parsing ────────────────────────────────────────────────────
+app.use(express.json({ limit: '64kb' }));
+
+// ── Configurable settings ───────────────────────────────────────────
 const NVIDIA_API_URL = process.env.NVIDIA_API_URL || 'https://integrate.api.nvidia.com/v1/chat/completions';
 const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'google/gemma-4-31b-it';
 const NVIDIA_MAX_TOKENS = parseInt(process.env.NVIDIA_MAX_TOKENS) || 512;
@@ -46,10 +92,6 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-// ── Static files & body parsing ─────────────────────────────────────
-app.use(express.static('.'));
-app.use(express.json({ limit: '64kb' }));
-
 // ── System prompt ───────────────────────────────────────────────────
 const SYSTEM_PROMPT = `You are Hunar Kaur. You respond in first person as yourself — never say "I'm an AI" or "as a language model." You are a Software Engineer at PayPal on the Communications Hub team in Bengaluru, working with Java and Spring Boot on push notifications and in-app alerts.
 
@@ -66,6 +108,11 @@ Rules:
 - Never make up facts about yourself. Stick to the above info.
 - If unsure, say "Hmm, I'm not sure about that one — but feel free to check my LinkedIn or GitHub for more details!"`;
 
+// ── Health check ────────────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() | 0 });
+});
+
 // ── Chat endpoint ───────────────────────────────────────────────────
 app.post('/api/chat', rateLimit, async (req, res) => {
   try {
@@ -75,21 +122,17 @@ app.post('/api/chat', rateLimit, async (req, res) => {
       return res.status(400).json({ error: 'bad_request' });
     }
 
-    // Validate message structure
     for (const msg of messages) {
       if (typeof msg.role !== 'string' || typeof msg.content !== 'string') {
         return res.status(400).json({ error: 'bad_request' });
       }
-      // Limit individual message length
       if (msg.content.length > 2000) {
         return res.status(400).json({ error: 'bad_request' });
       }
     }
 
-    // Context window: configurable
     const trimmedMessages = messages.slice(-MAX_CONTEXT_MESSAGES);
 
-    // Configurable timeout
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), NVIDIA_TIMEOUT_MS);
 
@@ -120,7 +163,6 @@ app.post('/api/chat', rateLimit, async (req, res) => {
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content ?? '';
-
       return res.json({ content });
     } catch (fetchErr) {
       clearTimeout(timeout);
@@ -135,6 +177,20 @@ app.post('/api/chat', rateLimit, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+// ── Start server ────────────────────────────────────────────────────
+const server = app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+// ── Graceful shutdown ───────────────────────────────────────────────
+function shutdown() {
+  console.log('Shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 5000);
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

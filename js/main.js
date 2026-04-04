@@ -24,7 +24,7 @@ function initDynamicBackground() {
 
   const ctx = canvas.getContext('2d');
   const isMobile = window.innerWidth < 768;
-  const BLOB_COUNT = isMobile ? 5 : 8;
+  const BLOB_COUNT = isMobile ? 3 : 5;
 
   let w, h;
   let mouseX = -9999, mouseY = -9999;
@@ -32,7 +32,7 @@ function initDynamicBackground() {
   let animId;
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     w = window.innerWidth;
     h = window.innerHeight;
     canvas.width = w * dpr;
@@ -145,50 +145,6 @@ function initDynamicBackground() {
       ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Inner bright core — glassy highlight
-      const innerR = b.radius * 0.35;
-      const highlight = ctx.createRadialGradient(
-        b.x - b.radius * 0.15,
-        b.y - b.radius * 0.15,
-        0,
-        b.x,
-        b.y,
-        innerR
-      );
-      highlight.addColorStop(0, `rgba(255, 255, 255, ${b.opacity * 0.5})`);
-      highlight.addColorStop(1, `rgba(255, 255, 255, 0)`);
-
-      ctx.fillStyle = highlight;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, innerR, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Draw interaction zones — where blobs overlap, add a subtle bright merge
-    for (let i = 0; i < blobs.length; i++) {
-      for (let j = i + 1; j < blobs.length; j++) {
-        const a = blobs[i], b = blobs[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const overlap = (a.radius + b.radius) - dist;
-
-        if (overlap > 0 && dist > 0) {
-          const midX = (a.x + b.x) / 2;
-          const midY = (a.y + b.y) / 2;
-          const mergeRadius = overlap * 0.6;
-          const mergeAlpha = Math.min(overlap / (a.radius + b.radius), 0.3) * 0.08;
-
-          const mergeGrad = ctx.createRadialGradient(midX, midY, 0, midX, midY, mergeRadius);
-          mergeGrad.addColorStop(0, `rgba(255, 255, 255, ${mergeAlpha})`);
-          mergeGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-          ctx.fillStyle = mergeGrad;
-          ctx.beginPath();
-          ctx.arc(midX, midY, mergeRadius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
     }
 
     animId = requestAnimationFrame(draw);

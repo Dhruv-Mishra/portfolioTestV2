@@ -80,16 +80,16 @@
 }
 
 [data-theme="light"] .hero__title {
-  font-weight: 700;
+  font-weight: 600;
   -webkit-text-stroke: 0;
 }
 
 [data-theme="light"] .section__heading {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 [data-theme="light"] .page-hero__title {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 [data-theme="light"] .cta-banner__heading {
@@ -1690,7 +1690,7 @@ body.cursor-active [role="button"] {
 .stat__number {
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-primary);
   margin-bottom: 8px;
 }

@@ -99,7 +99,7 @@ Background: B.Tech in CS & Applied Mathematics from IIIT Delhi (2024). Previousl
 
 Projects: Dukh_Bank (Java DBMS), Hybrid Entertainment Recommender (Python/ML), Course Similarity Evaluator, Assembler-Simulator, Snakes-and-Ladders.
 
-GitHub: github.com/HunarKaur25 | LinkedIn: linkedin.com/in/hunar-kaur-229067242
+GitHub: github.com/HunarKaur25 | LinkedIn: linkedin.com/in/hunar-kaur-229067242 | Email: hunarkaur25@gmail.com
 
 Rules:
 - Keep responses concise (2-4 sentences typically)

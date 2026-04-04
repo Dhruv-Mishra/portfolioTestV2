@@ -46,6 +46,10 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
+    [data-theme="light"] .chat-messages.scrolling::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.12);
+    }
+
     .chat-msg {
       display: flex;
       gap: 12px;
@@ -277,11 +281,11 @@
 
     .chat-welcome__suggestion {
       padding: 10px 20px;
-      border: 1px solid rgba(255, 118, 77, 0.25);
+      border: 1px solid var(--accent-glow);
       border-radius: 100px;
       font-size: 0.82rem;
       color: var(--text-secondary);
-      background: rgba(255, 118, 77, 0.04);
+      background: none;
       transition: all var(--transition-fast);
       font-family: var(--font-body);
       cursor: pointer;
@@ -408,6 +412,55 @@
       .chat-welcome__title { font-size: 1.2rem; }
       .chat-welcome__suggestion { font-size: 0.72rem; padding: 7px 12px; }
     }
+
+    /* Light theme chat overrides */
+    [data-theme="light"] .chat-input-bar__input {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="light"] .chat-input-bar__input:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    [data-theme="light"] .chat-clear-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="light"] .chat-msg--user .chat-msg__bubble {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    [data-theme="light"] .chat-msg--assistant .chat-msg__bubble {
+      background: var(--bg-card);
+      border-color: var(--glass-border);
+    }
+
+    [data-theme="light"] .chat-msg--user .chat-msg__avatar {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    [data-theme="light"] .chat-msg--assistant .chat-msg__avatar {
+      background: var(--bg-primary);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: var(--text-primary);
+    }
+
+    [data-theme="light"] .chat-dots-inline__dot {
+      background: var(--accent);
+    }
+
+    [data-theme="light"] .chat-bubble--filler {
+      opacity: 0.6;
+    }
+
+    [data-theme="light"] .chat-welcome__icon {
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -517,6 +570,13 @@
       </button>
     </div>
   </main>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
 
   <script src="js/main.js" defer></script>
   <script src="js/chat.js" defer></script>

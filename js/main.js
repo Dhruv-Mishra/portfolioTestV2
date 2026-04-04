@@ -14,7 +14,46 @@ document.addEventListener('DOMContentLoaded', () => {
   initTerminal();
   initTimeGreeting();
   initMarquee();
+  initThemeToggle();
 });
+
+/* ── Theme Toggle ─────────────────────────────────────────────────── */
+function initThemeToggle() {
+  const toggle = document.getElementById('themeToggle');
+  const STORAGE_KEY = 'hunar_theme';
+
+  // Load saved theme
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+
+  // Update icon based on current theme
+  function updateIcon() {
+    if (!toggle) return;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    // Sun icon for dark mode (click to switch to light), moon for light mode
+    toggle.innerHTML = isLight
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  }
+
+  updateIcon();
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem(STORAGE_KEY, 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem(STORAGE_KEY, 'light');
+      }
+      updateIcon();
+    });
+  }
+}
 
 /* ── Dynamic Background ───────────────────────────────────────────── */
 function initDynamicBackground() {
@@ -24,7 +63,7 @@ function initDynamicBackground() {
 
   const ctx = canvas.getContext('2d');
   const isMobile = window.innerWidth < 768;
-  const BLOB_COUNT = isMobile ? 3 : 5;
+  const BLOB_COUNT = isMobile ? 6 : 10;
 
   let w, h;
   let mouseX = -9999, mouseY = -9999;
@@ -58,32 +97,55 @@ function initDynamicBackground() {
     mouseY = e.clientY;
   }, { passive: true });
 
-  // Color palette — warm ambers, corals, cool blues at very low saturation
-  const palette = [
-    { r: 255, g: 118, b: 77 },   // accent coral
-    { r: 200, g: 140, b: 80 },   // amber
-    { r: 74, g: 144, b: 217 },   // cool blue
-    { r: 180, g: 100, b: 140 },  // dusty rose
-    { r: 120, g: 180, b: 160 },  // teal
-    { r: 220, g: 160, b: 60 },   // gold
-    { r: 140, g: 100, b: 200 },  // lavender
-    { r: 255, g: 154, b: 118 },  // peach
+  // Color palette — adapts to theme
+  const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+  const palette = isLightTheme ? [
+    { r: 120, g: 20, b: 160 },     // deep purple
+    { r: 180, g: 30, b: 60 },      // crimson red
+    { r: 30, g: 80, b: 180 },      // royal blue
+    { r: 90, g: 10, b: 150 },      // dark violet
+    { r: 200, g: 40, b: 80 },      // ruby
+    { r: 40, g: 60, b: 200 },      // cobalt blue
+    { r: 140, g: 25, b: 130 },     // dark magenta
+    { r: 60, g: 30, b: 170 },      // indigo
+    { r: 170, g: 35, b: 100 },     // deep rose
+    { r: 25, g: 100, b: 190 },     // ocean blue
+  ] : [
+    { r: 255, g: 120, b: 80 },     // bright coral
+    { r: 220, g: 150, b: 50 },     // warm amber
+    { r: 80, g: 160, b: 240 },     // bright blue
+    { r: 200, g: 80, b: 140 },     // hot rose
+    { r: 100, g: 210, b: 180 },    // bright teal
+    { r: 240, g: 180, b: 50 },     // bright gold
+    { r: 160, g: 100, b: 230 },    // bright lavender
+    { r: 255, g: 160, b: 120 },    // bright peach
   ];
 
   class Blob {
-    constructor(i) {
-      this.x = Math.random() * w;
-      this.y = Math.random() * h;
+    constructor(i, total) {
+      // Distribute blobs evenly across the viewport using grid seeding
+      const cols = Math.ceil(Math.sqrt(total * (w / h)));
+      const rows = Math.ceil(total / cols);
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cellW = w / cols;
+      const cellH = h / rows;
+      this.x = cellW * (col + 0.2 + Math.random() * 0.6);
+      this.y = cellH * (row + 0.2 + Math.random() * 0.6);
+
       const minDim = Math.min(w, h);
-      this.baseRadius = minDim * (0.08 + Math.random() * 0.12);
+      this.baseRadius = minDim * (isLightTheme ? (0.12 + Math.random() * 0.16) : (0.1 + Math.random() * 0.14));
       this.radius = this.baseRadius;
-      this.vx = (Math.random() - 0.5) * 0.3;
-      this.vy = (Math.random() - 0.5) * 0.3;
+      // Ensure non-zero velocity with minimum speed
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 0.3 + Math.random() * 0.4;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
       this.color = palette[i % palette.length];
       this.phase = Math.random() * Math.PI * 2;
       this.breathSpeed = 0.003 + Math.random() * 0.004;
       this.wobbleAmp = 0.08 + Math.random() * 0.06;
-      this.opacity = 0.04 + Math.random() * 0.03;
+      this.opacity = isLightTheme ? (0.35 + Math.random() * 0.2) : (0.09 + Math.random() * 0.06);
     }
 
     update(time) {
@@ -108,16 +170,16 @@ function initDynamicBackground() {
       this.y += this.vy;
 
       // Soft bounds — bounce gently
-      const margin = this.radius * 0.5;
-      if (this.x < -margin) this.vx += 0.02;
-      if (this.x > w + margin) this.vx -= 0.02;
-      if (this.y < -margin) this.vy += 0.02;
-      if (this.y > h + margin) this.vy -= 0.02;
+      const margin = this.radius * 0.3;
+      if (this.x < -margin) { this.x = -margin; this.vx = Math.abs(this.vx) * 0.5 + 0.05; }
+      if (this.x > w + margin) { this.x = w + margin; this.vx = -Math.abs(this.vx) * 0.5 - 0.05; }
+      if (this.y < -margin) { this.y = -margin; this.vy = Math.abs(this.vy) * 0.5 + 0.05; }
+      if (this.y > h + margin) { this.y = h + margin; this.vy = -Math.abs(this.vy) * 0.5 - 0.05; }
     }
   }
 
   for (let i = 0; i < BLOB_COUNT; i++) {
-    blobs.push(new Blob(i));
+    blobs.push(new Blob(i, BLOB_COUNT));
   }
 
   function draw(time) {
@@ -135,9 +197,10 @@ function initDynamicBackground() {
 
       // Outer glow layer
       const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius);
-      gradient.addColorStop(0, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity * 1.2})`);
-      gradient.addColorStop(0.4, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity * 0.6})`);
-      gradient.addColorStop(0.7, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity * 0.2})`);
+      gradient.addColorStop(0, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity})`);
+      gradient.addColorStop(0.35, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity * 0.7})`);
+      gradient.addColorStop(0.65, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.opacity * 0.3})`);
+      gradient.addColorStop(1, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, 0)`);
       gradient.addColorStop(1, `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, 0)`);
 
       ctx.fillStyle = gradient;

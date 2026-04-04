@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Hunar</title>
+  <meta name="description" content="Learn about Hunar — Software Engineer at PayPal, IIIT Delhi alumna, builder of scalable systems.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>">
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="cursor"></div>
+  <div class="scroll-progress"></div>
+  <div class="page-transition"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav__logo">hunar.</a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="about.html" class="nav__link active">About</a>
+      <a href="projects.html" class="nav__link">Projects</a>
+      <a href="chat.html" class="nav__link">Chat</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <button class="nav__grid-btn" aria-label="Open navigation menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="16" cy="4" r="1.5"/>
+        <circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/>
+        <circle cx="4" cy="16" r="1.5"/><circle cx="10" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/>
+      </svg>
+    </button>
+    <button class="nav__toggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Navigation Grid Menu -->
+  <div class="nav-grid" id="navGrid">
+    <div class="nav-grid__backdrop"></div>
+    <div class="nav-grid__panel">
+      <div class="nav-grid__items">
+        <a href="index.html" class="nav-grid__item">
+          <div class="nav-grid__icon">◆</div>
+          <span class="nav-grid__label">Home</span>
+        </a>
+        <a href="about.html" class="nav-grid__item">
+          <div class="nav-grid__icon">⌘</div>
+          <span class="nav-grid__label">About</span>
+        </a>
+        <a href="projects.html" class="nav-grid__item">
+          <div class="nav-grid__icon">◈</div>
+          <span class="nav-grid__label">Projects</span>
+        </a>
+        <a href="chat.html" class="nav-grid__item">
+          <div class="nav-grid__icon">▣</div>
+          <span class="nav-grid__label">Chat</span>
+        </a>
+        <a href="contact.html" class="nav-grid__item">
+          <div class="nav-grid__icon">✦</div>
+          <span class="nav-grid__label">Contact</span>
+        </a>
+        <a href="https://www.linkedin.com/in/hunar-kaur-229067242/" class="nav-grid__item" target="_blank" rel="noopener">
+          <div class="nav-grid__icon">in</div>
+          <span class="nav-grid__label">LinkedIn</span>
+        </a>
+        <a href="https://github.com/HunarKaur25" class="nav-grid__item" target="_blank" rel="noopener">
+          <div class="nav-grid__icon">⟨⟩</div>
+          <span class="nav-grid__label">GitHub</span>
+        </a>
+        <a href="about.html#terminal" class="nav-grid__item">
+          <div class="nav-grid__icon">&gt;_</div>
+          <span class="nav-grid__label">Terminal</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <span class="page-hero__label">About</span>
+    <h1 class="page-hero__title">The person behind<br>the <em>code</em></h1>
+    <p class="page-hero__desc">Engineer by trade, problem-solver by nature. I believe great software is equal parts logic and empathy.</p>
+  </div>
+
+  <!-- Interactive Terminal -->
+  <section class="section" id="terminal">
+    <div class="reveal">
+      <span class="section__label">Interactive</span>
+      <h2 class="section__heading">Try the <em>terminal</em></h2>
+      <p class="section__text" style="margin-bottom: 48px;">
+        An interactive way to learn more about me. Type <code style="color: var(--accent); font-family: var(--font-mono); font-size: 0.9em;">help</code> to get started.
+      </p>
+    </div>
+
+    <div class="terminal reveal reveal-delay-1">
+      <div class="terminal__header">
+        <div class="terminal__dot terminal__dot--red"></div>
+        <div class="terminal__dot terminal__dot--yellow"></div>
+        <div class="terminal__dot terminal__dot--green"></div>
+        <div class="terminal__title">hunar@portfolio — bash</div>
+      </div>
+      <div class="terminal__body">
+        <div class="terminal__line">
+          <span class="terminal__output" style="color: var(--text-muted);">Welcome to Hunar's interactive terminal.</span>
+        </div>
+        <div class="terminal__line">
+          <span class="terminal__output" style="color: var(--text-muted);">Type 'help' for available commands.</span>
+        </div>
+        <div class="terminal__line" style="margin-bottom: 16px;"></div>
+        <div class="terminal__input-line">
+          <span class="terminal__prompt">hunar@portfolio ~$&nbsp;</span>
+          <input type="text" class="terminal__input" spellcheck="false" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Intro -->
+  <section class="section">
+    <div class="about-intro reveal">
+      <div class="about-intro__photo">
+        <div class="about-intro__photo-placeholder">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="100" height="100" rx="20" stroke="rgba(255,118,77,0.15)" stroke-width="1"/>
+            <text x="60" y="68" text-anchor="middle" font-family="'Bodoni Moda', serif" font-size="48" font-weight="400" fill="rgba(245,241,235,0.12)">HK</text>
+            <circle cx="60" cy="60" r="45" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" fill="none"/>
+            <line x1="20" y1="60" x2="100" y2="60" stroke="rgba(255,118,77,0.06)" stroke-width="0.5"/>
+            <line x1="60" y1="20" x2="60" y2="100" stroke="rgba(255,118,77,0.06)" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="about-intro__text">
+        <h3>Building at the intersection of<br>craft and scale</h3>
+        <p>
+          I'm Hunar — a software engineer at PayPal where I work on the Communications Hub team, building and maintaining robust backend services that power push notifications and in-app alerts across the platform. My journey started with curiosity about how systems work at scale.
+        </p>
+        <p>
+          At IIIT Delhi, where I studied Computer Science and Applied Mathematics, I learned to bridge analytical problem-solving with software architecture. From designing user interfaces at ScrapUncle to optimizing low-latency APIs at PayPal, I bring a well-rounded, user-centric perspective to backend development.
+        </p>
+        <p>
+          When I'm not writing code, you'll find me exploring new technologies, experimenting with data analysis in Jupyter notebooks, or refining my understanding of system design and distributed computing.
+        </p>
+        <div style="margin-top: 32px;">
+          <div class="magnetic">
+            <a href="contact.html" class="btn btn--primary">
+              Get in Touch
+              <span class="btn__arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Journey / Timeline -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section__label">Journey</span>
+      <h2 class="section__heading">From campus to<br><em>production</em></h2>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline__item reveal reveal-delay-1">
+        <span class="timeline__year">2024 – Present</span>
+        <h3 class="timeline__title">Software Engineer 1</h3>
+        <div class="timeline__company">PayPal · Bengaluru, India</div>
+        <p class="timeline__desc">
+          Developing and maintaining backend services on the Communications Hub team using Java and Spring Boot. Supporting push notifications, in-app alerts, and out-of-badge alerts infrastructure across PayPal's global platform.
+        </p>
+      </div>
+
+      <div class="timeline__item reveal reveal-delay-2">
+        <span class="timeline__year">Summer 2023</span>
+        <h3 class="timeline__title">Software Engineer Intern</h3>
+        <div class="timeline__company">PayPal · Bengaluru, India</div>
+        <p class="timeline__desc">
+          Engineered solutions to reduce latency for internal APIs handling notification delivery. Implemented advanced caching strategies to optimize database and API response times, enhancing the user notification ecosystem.
+        </p>
+      </div>
+
+      <div class="timeline__item reveal reveal-delay-3">
+        <span class="timeline__year">Summer 2022</span>
+        <h3 class="timeline__title">UI Designer Intern</h3>
+        <div class="timeline__company">ScrapUncle · New Delhi, India</div>
+        <p class="timeline__desc">
+          Designed high-fidelity prototypes and interfaces for web and mobile applications using Figma and Canva. Contributed to improving visual consistency and the end-to-end user experience.
+        </p>
+      </div>
+
+      <div class="timeline__item reveal reveal-delay-4">
+        <span class="timeline__year">2020 – 2024</span>
+        <h3 class="timeline__title">B.Tech, CS & Applied Mathematics</h3>
+        <div class="timeline__company">IIIT Delhi · New Delhi, India</div>
+        <p class="timeline__desc">
+          Blended rigorous computer science coursework with advanced mathematical optimization and modeling. Built projects spanning database systems, recommender engines, and low-level computing.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Philosophy -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section__label">Philosophy</span>
+      <h2 class="section__heading">Principles I<br><em>build by</em></h2>
+    </div>
+
+    <div class="philosophy-grid">
+      <div class="philosophy-card reveal reveal-delay-1">
+        <span class="philosophy-card__num">01</span>
+        <h3 class="philosophy-card__title">Simplicity is the ultimate sophistication</h3>
+        <p class="philosophy-card__text">
+          Great code reads like prose. I obsess over naming, structure, and clarity — because the
+          most elegant solution is the one your future self (and your teammates) can understand at 2 AM.
+        </p>
+      </div>
+
+      <div class="philosophy-card reveal reveal-delay-2">
+        <span class="philosophy-card__num">02</span>
+        <h3 class="philosophy-card__title">Ship early, iterate always</h3>
+        <p class="philosophy-card__text">
+          Perfection is the enemy of progress. I believe in getting a solid v1 out the door,
+          gathering real feedback, and iterating relentlessly. The best features come from real usage data.
+        </p>
+      </div>
+
+      <div class="philosophy-card reveal reveal-delay-3">
+        <span class="philosophy-card__num">03</span>
+        <h3 class="philosophy-card__title">Engineer for humans first</h3>
+        <p class="philosophy-card__text">
+          Whether it's an API, a UI component, or an internal tool — the end user is always human.
+          I design developer experiences with the same care I put into user-facing products.
+        </p>
+      </div>
+
+      <div class="philosophy-card reveal reveal-delay-4">
+        <span class="philosophy-card__num">04</span>
+        <h3 class="philosophy-card__title">Leave it better than you found it</h3>
+        <p class="philosophy-card__text">
+          Every PR is an opportunity to improve the codebase. Refactor adjacent code, add missing tests,
+          improve docs. Small improvements compound into transformative change over time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner reveal">
+    <h2 class="cta-banner__heading">Want to know more?</h2>
+    <p class="cta-banner__text">Check out my projects or drop me a message. I'd love to hear from you.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <div class="magnetic">
+        <a href="projects.html" class="btn btn--primary">
+          View Projects
+          <span class="btn__arrow">→</span>
+        </a>
+      </div>
+      <div class="magnetic">
+        <a href="contact.html" class="btn btn--ghost">Contact Me</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span class="footer__text">© 2026 Hunar Kaur.</span>
+    <div class="footer__links">
+      <a href="https://www.linkedin.com/in/hunar-kaur-229067242/" class="footer__link">LinkedIn</a>
+      <a href="https://github.com/HunarKaur25" class="footer__link">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>

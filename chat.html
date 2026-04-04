@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat — Hunar</title>
+  <meta name="description" content="Chat with Hunar's AI assistant — ask about experience, skills, projects, or background.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>">
+
+  <style>
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      padding-top: var(--nav-height);
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px clamp(16px, 4vw, 32px) 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--glass-border) transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 2px;
+    }
+
+    .chat-msg {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+      animation: chatReveal 0.4s var(--ease-out) forwards;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    @keyframes chatReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-msg--user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-msg--assistant {
+      align-self: flex-start;
+    }
+
+    .chat-msg__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .chat-msg--user .chat-msg__avatar {
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .chat-msg--assistant .chat-msg__avatar {
+      background: var(--bg-elevated);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+    }
+
+    .chat-msg__bubble {
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .chat-msg--user .chat-msg__bubble {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
+    }
+
+    .chat-msg--assistant .chat-msg__bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+      font-weight: 400;
+    }
+
+    /* Typewriter cursor */
+    .chat-msg__bubble .typewriter-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: cursorBlink 0.8s step-end infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Typing indicator */
+    .chat-typing {
+      display: flex;
+      gap: 12px;
+      align-self: flex-start;
+      max-width: 85%;
+      animation: chatReveal 0.3s var(--ease-out) forwards;
+      opacity: 0;
+    }
+
+    .chat-typing__dots {
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      border-bottom-left-radius: 4px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .chat-typing__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+
+    .chat-typing__dot:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing__dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Input bar — floating transparent */
+    .chat-input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 12px clamp(16px, 4vw, 32px) calc(14px + env(safe-area-inset-bottom, 0px));
+      background: transparent;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      z-index: 100;
+    }
+
+    .chat-input-bar__input {
+      flex: 1;
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 14px 20px;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      outline: none;
+      resize: none;
+      max-height: 120px;
+      line-height: 1.5;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .chat-input-bar__input:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .chat-input-bar__input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .chat-input-bar__send {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+      border: none;
+      cursor: pointer;
+    }
+
+    .chat-input-bar__send:hover:not(:disabled) {
+      background: #ff8a66;
+      transform: scale(1.05);
+    }
+
+    .chat-input-bar__send:disabled {
+      opacity: 0.4;
+    }
+
+    .chat-input-bar__send svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Welcome state */
+    .chat-welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+      margin: auto 0;
+    }
+
+    .chat-welcome__icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .chat-welcome__title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 500;
+    }
+
+    .chat-welcome__desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      max-width: 400px;
+      line-height: 1.7;
+    }
+
+    .chat-welcome__suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      max-width: 500px;
+    }
+
+    .chat-welcome__suggestion {
+      padding: 10px 20px;
+      border: 1px solid rgba(255, 118, 77, 0.25);
+      border-radius: 100px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      background: rgba(255, 118, 77, 0.04);
+      transition: all var(--transition-fast);
+      font-family: var(--font-body);
+      cursor: pointer;
+      letter-spacing: 0.01em;
+    }
+
+    .chat-welcome__suggestion:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    /* Filler text styling */
+    .chat-bubble--filler {
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    /* Suggestions bar (appears after messages) */
+    .chat-suggestions-bar {
+      position: fixed;
+      bottom: 72px;
+      left: 0;
+      right: 0;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8px clamp(16px, 4vw, 32px);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      z-index: 99;
+      mask-image: linear-gradient(90deg, transparent, black 8px, black calc(100% - 24px), transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, black 8px, black calc(100% - 24px), transparent);
+    }
+
+    .chat-suggestions-bar::-webkit-scrollbar { display: none; }
+
+    .chat-suggestions-bar .chat-welcome__suggestion {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      padding: 7px 14px;
+    }
+
+    /* Clear chat button — inline with send */
+    .chat-clear-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .chat-clear-btn:hover {
+      border-color: #e54;
+      color: #e54;
+      background: rgba(238, 85, 68, 0.08);
+    }
+
+    .chat-clear-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .chat-msg { max-width: 92%; }
+      .chat-clear-btn { width: 38px; height: 38px; }
+      .chat-welcome { padding: 24px 16px; }
+      .chat-welcome__icon { font-size: 2rem; }
+      .chat-welcome__title { font-size: 1.4rem; }
+      .chat-welcome__desc { font-size: 0.88rem; }
+      .chat-welcome__suggestions { gap: 8px; max-width: 100%; }
+      .chat-welcome__suggestion { font-size: 0.78rem; padding: 8px 14px; }
+      .chat-input-bar { padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px)); gap: 6px; max-width: 100%; }
+      .chat-input-bar__input { padding: 12px 14px; font-size: 0.88rem; }
+      .chat-input-bar__send { width: 38px; height: 38px; }
+      .chat-msg__bubble { padding: 12px 14px; font-size: 0.88rem; }
+      .chat-msg__avatar { width: 28px; height: 28px; font-size: 0.65rem; }
+    }
+
+    @media (max-width: 360px) {
+      .chat-welcome__title { font-size: 1.2rem; }
+      .chat-welcome__suggestion { font-size: 0.72rem; padding: 7px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="cursor"></div>
+  <div class="scroll-progress"></div>
+  <div class="page-transition"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav__logo">hunar.</a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="projects.html" class="nav__link">Projects</a>
+      <a href="chat.html" class="nav__link active">Chat</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <button class="nav__grid-btn" aria-label="Open navigation menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="16" cy="4" r="1.5"/>
+        <circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/>
+        <circle cx="4" cy="16" r="1.5"/><circle cx="10" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/>
+      </svg>
+    </button>
+    <button class="nav__toggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Navigation Grid Menu -->
+  <div class="nav-grid" id="navGrid">
+    <div class="nav-grid__backdrop"></div>
+    <div class="nav-grid__panel">
+      <div class="nav-grid__items">
+        <a href="index.html" class="nav-grid__item">
+          <div class="nav-grid__icon">◆</div>
+          <span class="nav-grid__label">Home</span>
+        </a>
+        <a href="about.html" class="nav-grid__item">
+          <div class="nav-grid__icon">⌘</div>
+          <span class="nav-grid__label">About</span>
+        </a>
+        <a href="projects.html" class="nav-grid__item">
+          <div class="nav-grid__icon">◈</div>
+          <span class="nav-grid__label">Projects</span>
+        </a>
+        <a href="chat.html" class="nav-grid__item">
+          <div class="nav-grid__icon">▣</div>
+          <span class="nav-grid__label">Chat</span>
+        </a>
+        <a href="contact.html" class="nav-grid__item">
+          <div class="nav-grid__icon">✦</div>
+          <span class="nav-grid__label">Contact</span>
+        </a>
+        <a href="https://www.linkedin.com/in/hunar-kaur-229067242/" class="nav-grid__item" target="_blank" rel="noopener">
+          <div class="nav-grid__icon">in</div>
+          <span class="nav-grid__label">LinkedIn</span>
+        </a>
+        <a href="https://github.com/HunarKaur25" class="nav-grid__item" target="_blank" rel="noopener">
+          <div class="nav-grid__icon">⟨⟩</div>
+          <span class="nav-grid__label">GitHub</span>
+        </a>
+        <a href="about.html#terminal" class="nav-grid__item">
+          <div class="nav-grid__icon">&gt;_</div>
+          <span class="nav-grid__label">Terminal</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <main class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-welcome" id="chatWelcome">
+        <div class="chat-welcome__icon">◆</div>
+        <h1 class="chat-welcome__title">Chat with Hunar</h1>
+        <p class="chat-welcome__desc">Hey! I'm Hunar. Ask me about my work, projects, skills, or anything professional — I'd love to chat!</p>
+        <div class="chat-welcome__suggestions" id="chatSuggestions">
+          <button class="chat-welcome__suggestion" data-msg="What do you do at PayPal?">What do you do at PayPal?</button>
+          <button class="chat-welcome__suggestion" data-msg="Tell me about your projects">Tell me about your projects</button>
+          <button class="chat-welcome__suggestion" data-msg="What's your tech stack?">What's your tech stack?</button>
+          <button class="chat-welcome__suggestion" data-msg="Where did you study?">Where did you study?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-suggestions-bar" id="chatSuggestionsBar" style="display: none;">
+      <!-- Populated dynamically by chat.js -->
+    </div>
+
+    <div class="chat-input-bar">
+      <textarea class="chat-input-bar__input" id="chatInput" placeholder="Ask me anything..." rows="1"></textarea>
+      <button class="chat-input-bar__send" id="chatSend" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      <button class="chat-clear-btn" id="chatClear" title="Clear chat history" aria-label="Clear chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <script src="js/main.js" defer></script>
+  <script src="js/chat.js" defer></script>
+</body>
+</html>

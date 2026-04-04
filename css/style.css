@@ -63,7 +63,8 @@
 
 /* Light theme overrides for specific components */
 [data-theme="light"] .nav.scrolled {
-  background: rgba(250, 245, 247, 0.85);
+  background: rgba(235, 228, 232, 0.92);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="light"] .cursor {
@@ -101,9 +102,12 @@
 [data-theme="light"] .timeline__title,
 [data-theme="light"] .contact-info__value,
 [data-theme="light"] .about-intro__text h3,
-[data-theme="light"] .oss-card__name,
-[data-theme="light"] .stat__number {
+[data-theme="light"] .oss-card__name {
   font-weight: 500;
+}
+
+[data-theme="light"] .stat__number {
+  font-weight: 600;
 }
 
 [data-theme="light"] .hero__subtitle,
@@ -149,9 +153,7 @@
 }
 
 [data-theme="light"] .nav__links {
-  background: rgba(250, 245, 247, 0.97);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: #FAF5F7;
   border-left-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -588,10 +590,10 @@ body.cursor-active [role="button"] {
 }
 
 .nav.scrolled {
-  background: rgba(5, 5, 5, 0.8);
+  background: rgba(5, 5, 5, 0.9);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
 .nav__logo {
@@ -600,6 +602,10 @@ body.cursor-active [role="button"] {
   font-weight: 500;
   letter-spacing: 0.02em;
   transition: opacity var(--transition-fast);
+}
+
+.nav__logo-accent {
+  color: var(--accent);
 }
 
 .nav__logo:hover {
@@ -698,17 +704,24 @@ body.cursor-active [role="button"] {
   opacity: 0;
   transform: translateY(20px);
   animation: revealUp 0.8s var(--ease-out) 0.3s forwards;
+  white-space: nowrap;
+}
+
+.hero__greeting {
+  display: inline-block;
+  text-align: left;
+  min-width: calc(20ch + 20 * 0.15em);
 }
 
 .hero__title {
   font-family: var(--font-display);
   font-size: clamp(3.5rem, 10vw, 9rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
   margin-bottom: 32px;
   text-rendering: geometricPrecision;
-  -webkit-text-stroke: 0.5px rgba(245, 241, 235, 0.4);
+  -webkit-text-stroke: 0.3px rgba(245, 241, 235, 0.25);
   word-break: break-word;
 }
 
@@ -716,6 +729,7 @@ body.cursor-active [role="button"] {
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
+  padding-right: 4px;
 }
 
 .hero__title .word span {
@@ -730,6 +744,11 @@ body.cursor-active [role="button"] {
 .hero__title .word:nth-child(2) span { animation-delay: 0.65s; }
 .hero__title .word:nth-child(3) span { animation-delay: 0.8s; }
 
+.hero__surname {
+  color: var(--accent);
+  -webkit-text-stroke: 0;
+}
+
 @keyframes wordReveal {
   to {
     opacity: 1;
@@ -739,7 +758,7 @@ body.cursor-active [role="button"] {
 
 .hero__subtitle {
   font-size: clamp(1rem, 2vw, 1.25rem);
-  font-weight: 400;
+  font-weight: 450;
   color: var(--text-secondary);
   max-width: 520px;
   line-height: 1.7;
@@ -916,7 +935,7 @@ body.cursor-active [role="button"] {
 .section__heading {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.15;
   margin-bottom: 24px;
   letter-spacing: -0.01em;
@@ -924,7 +943,7 @@ body.cursor-active [role="button"] {
 
 .section__text {
   font-size: 1.05rem;
-  font-weight: 400;
+  font-weight: 450;
   color: var(--text-secondary);
   max-width: 600px;
   line-height: 1.8;
@@ -1030,7 +1049,7 @@ body.cursor-active [role="button"] {
 .project-card__title {
   font-family: var(--font-display);
   font-size: 1.6rem;
-  font-weight: 400;
+  font-weight: 500;
   margin-bottom: 12px;
   letter-spacing: -0.01em;
 }
@@ -1038,7 +1057,7 @@ body.cursor-active [role="button"] {
 .project-card__desc {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  font-weight: 400;
+  font-weight: 450;
   line-height: 1.7;
   margin-bottom: 20px;
 }
@@ -1117,13 +1136,13 @@ body.cursor-active [role="button"] {
 .about-intro__text h3 {
   font-family: var(--font-display);
   font-size: 1.8rem;
-  font-weight: 400;
+  font-weight: 500;
   margin-bottom: 24px;
 }
 
 .about-intro__text p {
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 450;
   color: var(--text-secondary);
   line-height: 1.9;
   margin-bottom: 20px;
@@ -1175,7 +1194,7 @@ body.cursor-active [role="button"] {
 .timeline__title {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  font-weight: 400;
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
@@ -1468,7 +1487,7 @@ body.cursor-active [role="button"] {
 .contact-info__value {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -1546,7 +1565,7 @@ body.cursor-active [role="button"] {
 .cta-banner__heading {
   font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 400;
+  font-weight: 600;
   margin-bottom: 24px;
 }
 
@@ -1585,7 +1604,7 @@ body.cursor-active [role="button"] {
 .page-hero__title {
   font-family: var(--font-display);
   font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.05;
   opacity: 0;
   animation: revealUp 0.8s var(--ease-out) 0.35s forwards;
@@ -1593,7 +1612,7 @@ body.cursor-active [role="button"] {
 
 .page-hero__desc {
   font-size: 1.1rem;
-  font-weight: 300;
+  font-weight: 450;
   color: var(--text-secondary);
   max-width: 550px;
   margin-top: 24px;
@@ -1735,13 +1754,14 @@ body.cursor-active [role="button"] {
 .philosophy-card__title {
   font-family: var(--font-display);
   font-size: 1.4rem;
+  font-weight: 500;
   margin-bottom: 12px;
 }
 
 .philosophy-card__text {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  font-weight: 400;
+  font-weight: 450;
   line-height: 1.7;
 }
 
@@ -1888,9 +1908,7 @@ body.cursor-active [role="button"] {
     width: 280px;
     height: 100%;
     height: 100dvh;
-    background: rgba(5, 5, 5, 0.95);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: #050505;
     flex-direction: column;
     justify-content: center;
     gap: 28px;
@@ -1910,7 +1928,11 @@ body.cursor-active [role="button"] {
   .nav__links::before {
     content: '';
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: -100vw;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     background: rgba(0,0,0,0.5);
     opacity: 0;
     transition: opacity 0.3s ease;

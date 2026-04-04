@@ -748,43 +748,37 @@ function initTimeGreeting() {
     'PayPal Comms Hub',
   ];
 
-  let currentIndex = 0;
-  let charIndex = 0;
-  let isDeleting = false;
-  let currentText = '';
+  let idx = 0;
+  let ci = taglines[0].length; // Start fully typed
+  let deleting = true; // Start by deleting first one after pause
 
-  function type() {
-    const target = taglines[currentIndex];
+  // Initial pause before starting to delete the pre-filled text
+  setTimeout(run, 3000);
 
-    if (!isDeleting) {
-      currentText = target.substring(0, charIndex + 1);
-      charIndex++;
+  function run() {
+    const word = taglines[idx];
+
+    if (deleting) {
+      ci--;
+      el.textContent = word.substring(0, ci);
+      if (ci <= 0) {
+        deleting = false;
+        idx = (idx + 1) % taglines.length;
+        setTimeout(run, 400);
+        return;
+      }
+      setTimeout(run, 35);
     } else {
-      currentText = target.substring(0, charIndex - 1);
-      charIndex--;
+      ci++;
+      el.textContent = word.substring(0, ci);
+      if (ci >= word.length) {
+        deleting = true;
+        setTimeout(run, 3000);
+        return;
+      }
+      setTimeout(run, 70 + Math.random() * 50);
     }
-
-    el.textContent = currentText;
-
-    let delay;
-
-    if (!isDeleting && charIndex === target.length) {
-      // Pause at full text
-      delay = 3000;
-      isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
-      // Move to next tagline
-      isDeleting = false;
-      currentIndex = (currentIndex + 1) % taglines.length;
-      delay = 500;
-    } else {
-      delay = isDeleting ? 40 : 80 + Math.random() * 40;
-    }
-
-    setTimeout(type, delay);
   }
-
-  type();
 }
 
 /* ── Marquee ──────────────────────────────────────────────────────── */

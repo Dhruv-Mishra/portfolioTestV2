@@ -357,27 +357,37 @@
     if (bub.cursorEl?.parentNode) bub.cursorEl.remove();
   }
 
-  // ── Filler system (NO typewriter — just instant text swap) ────
+  // ── Filler system (typewriter effect for thinking text) ────
   function startFiller(bub, owner) {
     bub.bubble.classList.add('chat-bubble--filler');
     bub.textEl.textContent = '';
 
-    // After FILLER_DELAY, start cycling filler texts (instant swap, no typewriter)
     let idx = 0;
     const t1 = setTimeout(() => {
       if (owner !== animOwner) return;
-      bub.textEl.textContent = FILLERS[idx++];
-      scrollToBottom();
-
-      const t2 = setInterval(() => {
-        if (owner !== animOwner) { clearInterval(t2); return; }
-        if (idx >= FILLERS.length) { clearInterval(t2); return; }
-        bub.textEl.textContent = FILLERS[idx++];
+      typeFillerText(bub.textEl, FILLERS[idx++], owner, () => {
         scrollToBottom();
-      }, FILLER_INTERVAL);
-      fillerTimers.push(t2);
+        const t2 = setInterval(() => {
+          if (owner !== animOwner) { clearInterval(t2); return; }
+          if (idx >= FILLERS.length) { clearInterval(t2); return; }
+          typeFillerText(bub.textEl, FILLERS[idx++], owner, () => scrollToBottom());
+        }, FILLER_INTERVAL);
+        fillerTimers.push(t2);
+      });
     }, FILLER_DELAY);
     fillerTimers.push(t1);
+  }
+
+  function typeFillerText(el, text, owner, onDone) {
+    let i = 0;
+    el.textContent = '';
+    function step() {
+      if (owner !== animOwner) { el.textContent = text; if (onDone) onDone(); return; }
+      if (i >= text.length) { if (onDone) onDone(); return; }
+      el.textContent += text[i++];
+      setTimeout(step, TYPE_SPEED + Math.random() * TYPE_VARIANCE);
+    }
+    step();
   }
 
   // ── Typewriter (owner-gated) ──────────────────────────────────

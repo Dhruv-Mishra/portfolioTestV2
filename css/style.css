@@ -713,6 +713,22 @@ body.cursor-active [role="button"] {
   min-width: calc(20ch + 20 * 0.15em);
 }
 
+@media (max-width: 768px) {
+  .hero__tag {
+    white-space: normal;
+    text-align: center;
+  }
+  .hero__tag-sep {
+    display: none;
+  }
+  .hero__greeting {
+    display: block;
+    text-align: center;
+    min-width: 0;
+    margin-top: 6px;
+  }
+}
+
 .hero__title {
   font-family: var(--font-display);
   font-size: clamp(3.5rem, 10vw, 9rem);
@@ -729,7 +745,6 @@ body.cursor-active [role="button"] {
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  padding-right: 4px;
 }
 
 .hero__title .word span {
